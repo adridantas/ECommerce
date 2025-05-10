@@ -84,8 +84,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setContentType("application/json");
         response.getWriter().write(
                 new ObjectMapper().writeValueAsString(
-                        new AuthenticationResponse(token, new UserResponseDTO(user)))
+                        new AuthenticationResponse(token, new UserResponseDTO(user))
+                )
         );
+
+
 
     }
 

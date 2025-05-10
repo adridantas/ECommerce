@@ -1,0 +1,30 @@
+package br.edu.utfpr.pb.pw44s.server.model;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "tb_order")
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
+    private LocalDateTime data;
+
+    @NotNull
+    @Column(name = "user_id")
+    private Long userId;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items;
+}

@@ -33,11 +33,16 @@ public class User implements UserDetails {
     @Size(min = 4)
     private String username;
 
+    @Setter
     @NotNull
     @Size(min = 6)
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",
             message = "{br.edu.utfpr.pb.pw44s.server.senha}")
     private String password;
+
+    @NotNull(message = "O campo 'email' não pode ser nulo.")
+    @jakarta.validation.constraints.Email(message = "Forneça um email válido.")
+    private String email;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -67,4 +72,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
