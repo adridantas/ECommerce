@@ -29,34 +29,14 @@ public class UserDTO {
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")
     private String password;
 
+    @NotNull
+    private String email;
+
     public UserDTO(User user) {
         this.id = user.getId();
         this.displayName = user.getDisplayName();
         this.username = user.getUsername();
-    }
-
-    public User getUser() {
-        User user = new User();
-        this.id = user.getId();
-        user.setId((this.id));
-        user.setDisplayName(this.getDisplayName());
-        user.setUsername(this.getUsername());
-        user.setPassword(this.getPassword());
-        return user;
-    }
-
-    public void toDTO(User user) {
-        this.id = user.getId();
-        this.displayName = user.getDisplayName();
-        this.username = user.getUsername();
-    }
-
-    public User toEntity() {
-        User user = new User();
-        user.setId(this.id);
-        user.setDisplayName(this.displayName);
-        user.setUsername(this.username);
-        return user;
+        this.password = user.getPassword();
     }
 
 }
