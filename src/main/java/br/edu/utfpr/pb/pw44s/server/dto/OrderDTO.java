@@ -1,5 +1,6 @@
 package br.edu.utfpr.pb.pw44s.server.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +13,7 @@ public class OrderDTO {
 
     private Long id;
     private LocalDateTime data;
-    private Long userId;
+    @NotNull
+    private Long addressId;
     private List<OrderItemDTO> items;
 }
