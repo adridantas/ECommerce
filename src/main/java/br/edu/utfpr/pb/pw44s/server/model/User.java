@@ -20,6 +20,12 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class User implements UserDetails {
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
+
+    @Column(nullable = false)
+    private Boolean active = false;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,32 +45,18 @@ public class User implements UserDetails {
             message = "{br.edu.utfpr.pb.pw44s.server.senha}")
     private String password;
 
+    @NotNull
+    @Column(nullable = false, unique = true)
+    private String email;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return AuthorityUtils.createAuthorityList("ROLE_USER");
+        return AuthorityUtils.createAuthorityList("ROLE_" + this.role.name());
     }
 
     @Override
-    @Transient
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    @Transient
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    @Transient
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    @Transient
     public boolean isEnabled() {
-        return true;
+        return Boolean.TRUE.equals(active);
     }
+
 }

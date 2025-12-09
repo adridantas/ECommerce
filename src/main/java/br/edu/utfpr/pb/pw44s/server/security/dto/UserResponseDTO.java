@@ -12,16 +12,18 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserResponseDTO {
 
+    private Long id;
     private String displayName;
     private String username;
     private Set<AuthorityResponseDTO> authorities;
 
     public UserResponseDTO(User user) {
+        this.id = user.getId();
         this.displayName = user.getDisplayName();
         this.username = user.getUsername();
         this.authorities = new HashSet<>();
-        for (GrantedAuthority authority: user.getAuthorities()) {
-            authorities.add( new AuthorityResponseDTO(authority.getAuthority()) );
+        for (GrantedAuthority authority : user.getAuthorities()) {
+            authorities.add(new AuthorityResponseDTO(authority.getAuthority()));
         }
     }
 }

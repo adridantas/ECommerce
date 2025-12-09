@@ -1,5 +1,6 @@
 package br.edu.utfpr.pb.pw44s.server.service;
 
+import br.edu.utfpr.pb.pw44s.server.model.Role;
 import br.edu.utfpr.pb.pw44s.server.model.User;
 import br.edu.utfpr.pb.pw44s.server.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,7 +18,10 @@ public class UserService {
     }
 
     public User save(User user) {
-        user.setPassword( bCryptPasswordEncoder.encode(user.getPassword()) );
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setActive(false); //deixar inativo ate um admin autorizar
+        user.setRole(Role.USER);
         return userRepository.save(user);
     }
+
 }

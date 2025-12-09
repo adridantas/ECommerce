@@ -57,15 +57,30 @@ public class WebSecurity {
 
         // configura a authorização das requisições
         http.authorizeHttpRequests((authorize) -> authorize
+
                 //permite que a rota "/users" seja acessada, mesmo sem o usuário estar autenticado desde que o método HTTP da requisição seja POST
                 .requestMatchers(antMatcher(HttpMethod.POST, "/users/**")).permitAll()
-                //permite que a rota "/error" seja acessada por qualquer requisição mesmo o usuário não estando autenticado
-                .requestMatchers(antMatcher("/error/**")).permitAll()
+
+                // 🔓 Login (Spring Security já pega pelo filtro de auth)
+                .requestMatchers(antMatcher(HttpMethod.POST, "/login")).permitAll()
+
                 //permite que a rota "/h2-console" seja acessada por qualquer requisição mesmo o usuário não estando autenticado
                 .requestMatchers(antMatcher("/h2-console/**")).permitAll()
+
+                //permite que a rota "/error" seja acessada por qualquer requisição mesmo o usuário não estando autenticado
+                .requestMatchers(antMatcher("/error/**")).permitAll()
+
+                // somente ROLE_ADMIN
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                //orders exige token
+                .requestMatchers(HttpMethod.POST, "/orders/**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/orders/**").authenticated()
+
                 //as demais rotas da aplicação só podem ser acessadas se o usuário estiver autenticado
                 .anyRequest().authenticated()
         );
+
         http.authenticationManager(authenticationManager)
                 //Filtro da Autenticação - sobrescreve o método padrão do Spring Security para Autenticação.
                 .addFilter(new JWTAuthenticationFilter(authenticationManager, authService))

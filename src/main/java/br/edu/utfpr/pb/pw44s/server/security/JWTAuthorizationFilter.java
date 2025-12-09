@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import java.io.IOException;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
+
     private final AuthService authService;
 
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager, AuthService authService) {
@@ -25,41 +26,66 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response, FilterChain chain)
+                                    HttpServletResponse response,
+                                    FilterChain chain)
             throws IOException, ServletException {
-        //Recuperar o token do Header(cabeçalho) da requisição
+
         String header = request.getHeader(SecurityConstants.HEADER_STRING);
-        //Verifica se o token existe no cabeçalho
-        if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+
+        if (header == null ||
+                !header.startsWith(SecurityConstants.TOKEN_PREFIX) ||
+                header.length() <= SecurityConstants.TOKEN_PREFIX.length()) {
+
             chain.doFilter(request, response);
             return;
         }
-        //Chama o método getAuthentication e retorna o usuário autenticado para dar sequência na requisição
-        UsernamePasswordAuthenticationToken authenticationToken =
-                getAuthentication(request);
-        //Adiciona o usuário autenticado no contexto do spring security
+
+        UsernamePasswordAuthenticationToken authenticationToken = getAuthentication(request);
+
+        if (authenticationToken == null) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         chain.doFilter(request, response);
     }
 
-    private UsernamePasswordAuthenticationToken
-    getAuthentication(HttpServletRequest request) {
+    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
+
         String token = request.getHeader(SecurityConstants.HEADER_STRING);
+
         if (token != null) {
-            //verifica se o token é válido e retorna o username
-            String username =
-                    JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET))
-                            .build()
-                            .verify(token.replace(SecurityConstants.TOKEN_PREFIX, ""))
-                            .getSubject();
-            if (username != null) {
-                // com posse do username é verificado se ele existe na base de dados
-                User user = (User) authService.loadUserByUsername(username);
-                //caso exista o usuário é autenticado e a requisição continua a ser executada.
-                return new UsernamePasswordAuthenticationToken(username, null,
-                        user.getAuthorities());
+
+            String pureToken = token.replace(SecurityConstants.TOKEN_PREFIX, "").trim();
+
+            if (pureToken.isBlank()) {
+                return null;
+            }
+
+            try {
+                String username = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET))
+                        .build()
+                        .verify(pureToken)
+                        .getSubject();
+
+                if (username != null) {
+                    User user = (User) authService.loadUserByUsername(username);
+
+                    return new UsernamePasswordAuthenticationToken(
+                            user,
+                            null,
+                            user.getAuthorities()
+                    );
+
+                }
+
+            } catch (Exception e) {
+                System.out.println("Token inválido recebido: " + pureToken);
+                return null;
             }
         }
+
         return null;
     }
 }

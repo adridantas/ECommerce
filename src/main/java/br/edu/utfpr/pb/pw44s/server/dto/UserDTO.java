@@ -1,13 +1,13 @@
 package br.edu.utfpr.pb.pw44s.server.dto;
 
 import br.edu.utfpr.pb.pw44s.server.model.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -25,38 +25,21 @@ public class UserDTO {
     private String displayName;
 
     @NotNull
+    @Email(message = "O e-mail informado não é válido")
+    private String email;
+
+    @NotNull
     @Size(min = 6)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$")
+    @Pattern(
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",
+            message = "A senha deve conter ao menos 1 letra minúscula, 1 letra maiúscula e 1 número"
+    )
     private String password;
 
     public UserDTO(User user) {
         this.id = user.getId();
         this.displayName = user.getDisplayName();
         this.username = user.getUsername();
+        this.email = user.getEmail();
     }
-
-    public User getUser() {
-        User user = new User();
-        this.id = user.getId();
-        user.setId((this.id));
-        user.setDisplayName(this.getDisplayName());
-        user.setUsername(this.getUsername());
-        user.setPassword(this.getPassword());
-        return user;
-    }
-
-    public void toDTO(User user) {
-        this.id = user.getId();
-        this.displayName = user.getDisplayName();
-        this.username = user.getUsername();
-    }
-
-    public User toEntity() {
-        User user = new User();
-        user.setId(this.id);
-        user.setDisplayName(this.displayName);
-        user.setUsername(this.username);
-        return user;
-    }
-
 }
